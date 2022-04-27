@@ -1,1 +1,1 @@
-# Templates
+# Samples for android projects
