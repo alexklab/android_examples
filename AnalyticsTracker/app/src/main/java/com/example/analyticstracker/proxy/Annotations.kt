@@ -1,4 +1,4 @@
-package com.example.analyticstracker
+package com.example.analyticstracker.proxy
 
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)

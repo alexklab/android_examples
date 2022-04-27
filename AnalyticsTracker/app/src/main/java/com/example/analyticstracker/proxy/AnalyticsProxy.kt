@@ -8,6 +8,8 @@ class AnalyticsProxy constructor(
     private val cached: Boolean
 ) {
 
+    inline fun <reified T : Any> create(): T = create(T::class.java)
+
     @Suppress("UNCHECKED_CAST")
     fun <T : Any> create(clazz: Class<T>): T {
         return Proxy.newProxyInstance(
@@ -19,9 +21,4 @@ class AnalyticsProxy constructor(
             }
         ) as T
     }
-
-    inline fun <reified T : Any> create(): T {
-        return create(T::class.java)
-    }
-
 }

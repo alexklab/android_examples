@@ -1,8 +1,6 @@
 package com.example.analyticstracker.proxy
 
 import com.example.analyticstracker.AnalyticsService
-import com.example.analyticstracker.EventName
-import com.example.analyticstracker.Param
 import java.lang.IllegalArgumentException
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.Method

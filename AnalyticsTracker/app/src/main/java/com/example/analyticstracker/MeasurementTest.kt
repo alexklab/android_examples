@@ -1,6 +1,8 @@
 package com.example.analyticstracker
 
 import com.example.analyticstracker.proxy.AnalyticsProxy
+import com.example.analyticstracker.proxy.EventName
+import com.example.analyticstracker.proxy.Param
 import kotlin.system.measureNanoTime
 
 object MeasurementTest {
