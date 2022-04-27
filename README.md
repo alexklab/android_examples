@@ -1,1 +1,1 @@
-# android_examples
+# Templates
