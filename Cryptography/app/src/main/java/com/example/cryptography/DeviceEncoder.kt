@@ -44,16 +44,18 @@ class DeviceEncoder {
         val keyPairGenerator = KeyPairGenerator.getInstance(
             KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore"
         )
-        keyPairGenerator.initialize(
-            KeyGenParameterSpec.Builder(
-                ALIAS,
-                KeyProperties.PURPOSE_SIGN or KeyProperties.PURPOSE_VERIFY
-                        //   or KeyProperties.PURPOSE_DECRYPT or KeyProperties.PURPOSE_ENCRYPT
-                        or KeyProperties.PURPOSE_AGREE_KEY
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            keyPairGenerator.initialize(
+                KeyGenParameterSpec.Builder(
+                    ALIAS,
+                    KeyProperties.PURPOSE_SIGN or KeyProperties.PURPOSE_VERIFY
+                               or KeyProperties.PURPOSE_DECRYPT or KeyProperties.PURPOSE_ENCRYPT
+                            or KeyProperties.PURPOSE_AGREE_KEY
+                )
+                    .setAlgorithmParameterSpec(ECGenParameterSpec("secp256r1"))
+                    .build()
             )
-                .setAlgorithmParameterSpec(ECGenParameterSpec("secp256r1"))
-                .build()
-        )
+        }
 
         return keyPairGenerator.generateKeyPair()
             .also { keyPair = it }
@@ -80,7 +82,7 @@ class DeviceEncoder {
         val keyAgreement = KeyAgreement.getInstance("ECDH", "AndroidKeyStore")
         keyAgreement.init(keys.private)
         keyAgreement.doPhase(remotePublicKey, true)
-        val sharedSecret = byteArrayOf() //keyAgreement.generateSecret()
+        val sharedSecret = keyAgreement.generateSecret()
 
         val info = ByteArrayOutputStream()
         info.write("ECDH secp256r1 AES-256-GCM-SIV\\0".toByteArray())
@@ -96,7 +98,7 @@ class DeviceEncoder {
         )
 
         val associatedData = byteArrayOf()
-        val decryptedCvv = key.encrypt(data.encryptedCvv.decodeBase64(), associatedData)
+        val decryptedCvv = key.decrypt(data.encryptedCvv.decodeBase64(), associatedData)
 
 
         log.d("decodeCvv <<< ${String(decryptedCvv)}")
@@ -144,9 +146,7 @@ class DeviceEncoder {
 
         // This example uses the Tink library and the HKDF key derivation function.
         val key = AesGcmSiv(
-            Hkdf.computeHkdf(
-                "HMACSHA256", sharedSecret, salt, info.toByteArray(), 32
-            )
+            Hkdf.computeHkdf("HMACSHA256", sharedSecret, salt, info.toByteArray(), 32)
         )
 
         val associatedData = byteArrayOf()
